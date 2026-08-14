@@ -20,10 +20,14 @@ class JsonLogger(logging.Formatter):
         }
         return json.dumps(log_record)
 
+
 log = logging.getLogger("my_sample_logging")
 log.setLevel(logging.INFO)
 h = logging.StreamHandler();h.setFormatter(JsonLogger())
+z = logging.FileHandler('web.log');z.setFormatter(JsonLogger())
 log.addHandler(h)
+log.addHandler(z)
+log.propagate = False 
 
 
 @app.get("/first_endpoint")
