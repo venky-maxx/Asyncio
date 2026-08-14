@@ -1,6 +1,7 @@
 import asyncio
 
 async def function():
+    await asyncio.sleep(5)
     return "Testing"
 
 async def hru():
