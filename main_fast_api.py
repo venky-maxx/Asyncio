@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import uvicorn
 import logging, json, time
+from fastapi.responses import StreamingResponse
+import asyncio
 
 app = FastAPI(title ="my first api call")
 
@@ -39,6 +41,24 @@ async def user_register(user_details:User):
     log.info(f"User details received {user_details}")
     msg = f"{user_details.username} is registered successfully...!"
     return msg 
+
+class Question(BaseModel):
+    question : str
+
+@app.post("/streaming")
+async def streaming(question:Question):
+    return StreamingResponse(
+        stream_answer(question), 
+        media_type ="text/plain"
+    )
+
+async def stream_answer(question:str):
+    ans = """A big lion was sleeping peacefully under a tree in the green jungle. A tiny mouse ran across his paw by accident. The sudden movement woke the lion up.The angry lion caught the little mouse in his giant paw and opened his mouth to eat him. The scared mouse cried out, "Please, do not eat me! If you let me go, I will help you one day!"The lion laughed because the mouse was so small. How could a tiny creature ever help a strong lion? Still, the kind lion opened his paw and let the mouse run away.A few weeks later, hunters walked through the jungle. They caught the big lion in a strong rope net tied to a tree. The lion roared loudly, unable to break free.The little mouse heard the loud roar and ran over to help. Using his sharp teeth, the mouse chewed through the tough ropes quickly. Soon, the big lion was free again.The lion smiled at his tiny friend and learned a great truth: even the smallest friend can be a great help."""
+    for word in ans.split(" "):
+        yield word +" "
+        await asyncio.sleep(0.1)
+
+
 
 if __name__ == "__main__":
     uvicorn.run(
